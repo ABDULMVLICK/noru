@@ -1,0 +1,27 @@
+services:
+  # Base de données relationnelle (Utilisateur, Beneficiaire, Transfert)
+  mysql:
+    image: mysql:8.0
+    container_name: noru-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Base NoSQL (journal des notifications)
+  mongo:
+    image: mongo:7
+    container_name: noru-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mysql_data:
+  mongo_data:

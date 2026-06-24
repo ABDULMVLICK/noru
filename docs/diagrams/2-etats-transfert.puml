@@ -1,0 +1,15 @@
+@startuml etats-transfert-noru
+[*] --> EN_ATTENTE : créer le transfert
+
+EN_ATTENTE --> PAYE : paiement validé
+EN_ATTENTE --> ECHEC : paiement refusé / abandon
+PAYE --> ENVOYE : traité par NORU
+ENVOYE --> RECU : marqué reçu (notification envoyée)
+ENVOYE --> ECHEC : incident de traitement
+
+RECU --> [*]
+ECHEC --> [*]
+
+note right of EN_ATTENTE : statut initial à la création
+note right of RECU : fonds disponibles, receveur notifié
+@enduml

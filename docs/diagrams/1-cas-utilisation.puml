@@ -1,0 +1,37 @@
+@startuml cas-utilisation-noru
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Visiteur" as V
+actor "Envoyeur" as E
+actor "Admin" as A
+actor "Receveur" as R
+
+rectangle "Système NORU" {
+  usecase "S'inscrire" as UC1
+  usecase "Se connecter" as UC2
+  usecase "Gérer ses bénéficiaires" as UC3
+  usecase "Créer un transfert" as UC4
+  usecase "Faux paiement mobile money" as UC5
+  usecase "Consulter ses transferts" as UC6
+  usecase "Supprimer son compte (RGPD)" as UC7
+  usecase "Superviser les transferts" as UC8
+  usecase "Changer le statut d'un transfert" as UC9
+  usecase "Consulter les statistiques" as UC10
+  usecase "Recevoir une notification" as UC11
+}
+
+V --> UC1
+V --> UC2
+E --> UC2
+E --> UC3
+E --> UC4
+E --> UC6
+E --> UC7
+UC4 ..> UC5 : <<include>>
+UC9 ..> UC11 : <<include>>
+A --> UC8
+A --> UC9
+A --> UC10
+UC11 --> R
+@enduml
