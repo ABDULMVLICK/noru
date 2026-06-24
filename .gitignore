@@ -1,0 +1,26 @@
+# Dépendances
+node_modules/
+**/node_modules/
+
+# Variables d'environnement et secrets (NE JAMAIS versionner)
+.env
+**/.env
+!**/.env.example
+
+# Build
+dist/
+build/
+**/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Système
+.DS_Store
+
+# Dossier professionnel (données personnelles — hors dépôt public)
+dossier-pro/
+
+# Prisma (base locale)
+*.db

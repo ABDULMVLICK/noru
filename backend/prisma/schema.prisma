@@ -1,0 +1,66 @@
+// Schéma Prisma de NORU — traduction directe du MLD (docs/03-modele-de-donnees.md)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum StatutTransfert {
+  EN_ATTENTE
+  PAYE
+  ENVOYE
+  RECU
+  ECHEC
+}
+
+model Utilisateur {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique @db.VarChar(180)
+  motDePasse    String         @map("mot_de_passe") @db.VarChar(255)
+  nom           String         @db.VarChar(100)
+  role          Role           @default(USER)
+  rgpdAccepte   Boolean        @default(false) @map("rgpd_accepte")
+  dateCreation  DateTime       @default(now()) @map("date_creation")
+  beneficiaires Beneficiaire[]
+  transferts    Transfert[]
+
+  @@map("utilisateur")
+}
+
+model Beneficiaire {
+  id            Int         @id @default(autoincrement())
+  nomComplet    String      @map("nom_complet") @db.VarChar(150)
+  email         String      @db.VarChar(180)
+  iban          String      @db.VarChar(34)
+  utilisateurId Int         @map("utilisateur_id")
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  dateCreation  DateTime    @default(now()) @map("date_creation")
+  transferts    Transfert[]
+
+  @@map("beneficiaire")
+}
+
+model Transfert {
+  id             Int             @id @default(autoincrement())
+  montantFcfa    Decimal         @map("montant_fcfa") @db.Decimal(12, 2)
+  montantEur     Decimal         @map("montant_eur") @db.Decimal(12, 2)
+  fraisFcfa      Decimal         @default(0) @map("frais_fcfa") @db.Decimal(12, 2)
+  tauxChange     Decimal         @map("taux_change") @db.Decimal(10, 6)
+  statut         StatutTransfert @default(EN_ATTENTE)
+  reference      String          @unique @db.VarChar(30)
+  utilisateurId  Int             @map("utilisateur_id")
+  utilisateur    Utilisateur     @relation(fields: [utilisateurId], references: [id])
+  beneficiaireId Int             @map("beneficiaire_id")
+  beneficiaire   Beneficiaire    @relation(fields: [beneficiaireId], references: [id])
+  dateCreation   DateTime        @default(now()) @map("date_creation")
+
+  @@map("transfert")
+}
