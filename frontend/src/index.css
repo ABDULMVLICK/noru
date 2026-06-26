@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* On force le thème clair (sinon le navigateur peut afficher un fond sombre). */
+html {
+  color-scheme: light;
+}
+
+/* Police et fond de base. Le reste du style se fait avec les classes
+   utilitaires Tailwind directement dans les composants. */
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: #f9fafb;
+  color: #18211e;
+}
