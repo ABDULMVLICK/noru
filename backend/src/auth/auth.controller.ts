@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -25,5 +25,12 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: UtilisateurConnecte) {
     return user;
+  }
+
+  // RGPD : l'utilisateur supprime son propre compte.
+  @UseGuards(JwtAuthGuard)
+  @Delete('me')
+  supprimerCompte(@CurrentUser() user: UtilisateurConnecte) {
+    return this.auth.supprimerCompte(user.id);
   }
 }

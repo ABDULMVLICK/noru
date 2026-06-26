@@ -56,6 +56,17 @@ export class AuthService {
     return this.signerToken(user.id, user.email, user.role);
   }
 
+  // RGPD — droit à l'effacement : supprime le compte et toutes ses données.
+  // On supprime d'abord les transferts (clé étrangère), les bénéficiaires
+  // étant supprimés en cascade avec l'utilisateur.
+  async supprimerCompte(utilisateurId: number) {
+    await this.prisma.$transaction([
+      this.prisma.transfert.deleteMany({ where: { utilisateurId } }),
+      this.prisma.utilisateur.delete({ where: { id: utilisateurId } }),
+    ]);
+    return { message: 'Compte et données supprimés' };
+  }
+
   // Fabrique le JWT. Le "payload" est ce que le token transporte (jamais le mot de passe).
   private async signerToken(id: number, email: string, role: string) {
     const payload = { sub: id, email, role };
