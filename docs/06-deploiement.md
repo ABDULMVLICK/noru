@@ -2,69 +2,58 @@
 
 > Phase 5. Décrit l'environnement de production, la procédure de déploiement et le rollback.
 
-## 1. Vue d'ensemble
+## 1. Architecture de production
 
-| Élément | Rôle |
+| Composant | Hébergeur | Détail |
+|---|---|---|
+| Frontend (React) | **Vercel** | Build du projet Vite, sert le SPA |
+| Backend (NestJS) | **Railway** | Build du `Dockerfile`, conteneur exposant l'API |
+| MySQL | **Railway** | Service base de données |
+| MongoDB | **Railway** | Service base de données |
+| Images Docker | **GHCR** | Publiées par la CD (preuve de conteneurisation) |
+
+Le frontend (Vercel) appelle le backend (Railway) via son URL publique (`VITE_API_URL`), et le backend autorise cette origine via CORS (`CORS_ORIGIN`).
+
+## 2. Variables d'environnement
+
+**Backend (Railway)**
+| Variable | Valeur |
 |---|---|
-| GitHub Actions (`ci.yml`) | Intégration continue : lint + tests à chaque push/PR |
-| GitHub Actions (`cd.yml`) | Déploiement continu : build des images → GHCR → SSH sur le VPS |
-| GHCR (GitHub Container Registry) | Stocke les images Docker (`noru-backend`, `noru-frontend`) |
-| VPS (serveur Linux) | Exécute les conteneurs via `docker-compose.prod.yml` |
+| `DATABASE_URL` | fournie par le service MySQL de Railway |
+| `MONGODB_URI` | fournie par le service MongoDB de Railway |
+| `JWT_SECRET` | secret long et aléatoire |
+| `JWT_EXPIRES_IN` | `1d` |
+| `CORS_ORIGIN` | URL publique du frontend Vercel |
+| `PORT` | fournie automatiquement par Railway |
 
-**Chaîne complète :** `push sur main` → CI verte → build images → publication GHCR (tags `latest` + SHA) → SSH sur le VPS → `docker compose pull && up -d` → application à jour sur l'URL publique.
-
-## 2. Environnements
-
-- **Développement** : machine locale, `docker compose up` (MySQL + Mongo) + `npm run start:dev` / `npm run dev`.
-- **Test (CI)** : runner GitHub avec MySQL + MongoDB en services, exécution des tests.
-- **Production** : VPS, images tirées depuis GHCR, `docker-compose.prod.yml`.
-
-## 3. Préparation du serveur (une seule fois)
-
-1. Mettre à jour le système : `sudo apt update && sudo apt upgrade -y`
-2. Installer Docker et Docker Compose.
-3. Créer un utilisateur `deploy` non-root, membre du groupe `docker`.
-4. Ajouter la clé SSH publique de déploiement pour `deploy`.
-5. Désactiver la connexion SSH par mot de passe (clé uniquement).
-6. Activer le pare-feu : `ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw enable`
-7. Déposer sur le serveur, dans `~/noru/` : `docker-compose.prod.yml` et un fichier `.env` (NON versionné) contenant `MYSQL_ROOT_PASSWORD` et `JWT_SECRET`.
-
-## 4. Secrets GitHub à configurer
-
-Dans le dépôt → Settings → Secrets and variables → Actions :
-
-| Secret | Contenu |
+**Frontend (Vercel)**
+| Variable | Valeur |
 |---|---|
-| `SERVER_HOST` | Adresse IP du VPS |
-| `SERVER_USER` | `deploy` |
-| `SSH_PRIVATE_KEY` | Clé SSH privée de déploiement |
+| `VITE_API_URL` | URL publique du backend Railway |
 
-Le `GITHUB_TOKEN` (authentification GHCR) est fourni automatiquement par GitHub.
-
-## 5. Procédure de déploiement (automatique)
+## 3. Procédure de déploiement (automatique)
 
 1. Le travail est développé sur des branches, fusionné dans `develop`.
 2. Une Pull Request `develop → main` est ouverte ; la CI doit être verte.
-3. Après merge, le workflow `cd.yml` se déclenche automatiquement.
-4. Les images sont construites, publiées sur GHCR, et le VPS est mis à jour par SSH.
-5. L'application est accessible sur `http://<IP_DU_VPS>`.
+3. Après merge sur `main` :
+   - **Railway** reconstruit et redéploie le backend automatiquement.
+   - **Vercel** reconstruit et redéploie le frontend automatiquement.
+   - Le workflow **`cd.yml`** publie en plus les images Docker sur GHCR (tags `latest` + SHA).
+4. Les migrations Prisma s'appliquent au démarrage du conteneur backend (`prisma migrate deploy`).
 
-## 6. Procédure de rollback
+## 4. Conteneurisation (compétence C11)
 
-En cas de bug critique en production, on revient à la version stable précédente.
-Stratégie « retag latest » (environ 3 minutes) :
+- `backend/Dockerfile` et `frontend/Dockerfile` : construction des images.
+- `docker-compose.prod.yml` : définition de la stack complète (backend + frontend + MySQL + MongoDB), utilisable telle quelle sur un serveur/VPS.
+- Images publiées sur GHCR avec un tag `SHA` unique par commit.
 
-```bash
-# 1. Identifier le SHA du dernier commit stable (avant le bug)
-# 2. Tirer l'image correspondante et la retagger en latest
-docker pull ghcr.io/abdulmvlick/noru-backend:<SHA_STABLE>
-docker tag  ghcr.io/abdulmvlick/noru-backend:<SHA_STABLE> ghcr.io/abdulmvlick/noru-backend:latest
-docker push ghcr.io/abdulmvlick/noru-backend:latest
-# 3. Sur le VPS : redéployer
-ssh deploy@<IP> "cd ~/noru && docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d"
-```
+## 5. Procédure de rollback
 
-C'est pour rendre le rollback possible que chaque image est taguée avec le **SHA** du commit (identifiant unique et stable), en plus de `latest`.
+En cas de bug critique en production :
+
+- **Sur Railway** : ouvrir le service → onglet *Deployments* → sélectionner le dernier déploiement stable → *Redeploy*. Retour à la version précédente en ~1 minute.
+- **Sur Vercel** : *Deployments* → déploiement stable précédent → *Promote to Production*.
+- **Via les images Docker** (si déploiement par conteneurs) : chaque image porte un tag `SHA` ; on retire l'image stable correspondante et on la redéploie (`docker pull ghcr.io/.../noru-backend:<SHA_STABLE>` puis redémarrage).
 
 ### Autres stratégies de déploiement (à connaître)
 
