@@ -15,7 +15,8 @@ import { JwtStrategy } from './jwt.strategy';
         secret: config.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
           // ex. "1d", "12h"... typé librement car vient du .env
-          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ?? '1d') as `${number}d`,
+          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ??
+            '1d') as `${number}d`,
         },
       }),
     }),

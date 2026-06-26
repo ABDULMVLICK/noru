@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { ChangerStatutDto } from './dto/changer-statut.dto';
+import {
+  ChangerStatutDto,
+  StatutTransfertEnum,
+} from './dto/changer-statut.dto';
 
 @Injectable()
 export class AdminService {
@@ -48,7 +51,7 @@ export class AdminService {
       include: { beneficiaire: true },
     });
 
-    if (dto.statut === 'RECU') {
+    if (dto.statut === StatutTransfertEnum.RECU) {
       await this.notifications.notifierReception({
         destinataire: transfert.beneficiaire.email,
         nomReceveur: transfert.beneficiaire.nomComplet,

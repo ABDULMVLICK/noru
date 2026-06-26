@@ -34,7 +34,9 @@ export class NotificationsService {
       statutEnvoi: 'ENVOYE',
     });
 
-    this.logger.log(`📧 (simulé) Email envoyé à ${params.destinataire} — ${sujet}`);
+    this.logger.log(
+      `📧 (simulé) Email envoyé à ${params.destinataire} — ${sujet}`,
+    );
     return notif;
   }
 

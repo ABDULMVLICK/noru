@@ -1,4 +1,10 @@
-import { IsBoolean, IsEmail, IsString, MinLength, Equals } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsString,
+  MinLength,
+  Equals,
+} from 'class-validator';
 
 // Données attendues pour l'inscription. Chaque décorateur = une règle de validation.
 export class RegisterDto {
@@ -15,6 +21,8 @@ export class RegisterDto {
 
   // Le consentement RGPD est obligatoire et doit valoir true.
   @IsBoolean()
-  @Equals(true, { message: 'Vous devez accepter la politique de confidentialité (RGPD)' })
+  @Equals(true, {
+    message: 'Vous devez accepter la politique de confidentialité (RGPD)',
+  })
   rgpdAccepte: boolean;
 }
