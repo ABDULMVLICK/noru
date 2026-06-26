@@ -1,5 +1,7 @@
-// Adresse de l'API NestJS.
-const BASE = 'http://localhost:3000/api';
+// Adresse de l'API, en chemin relatif. En développement, Vite redirige /api
+// vers http://localhost:3000 (voir vite.config.ts). En production, nginx
+// redirige /api vers le conteneur backend. Dans les deux cas : même origine.
+const BASE = '/api';
 
 // Récupère le token JWT stocké après connexion.
 function getToken(): string | null {

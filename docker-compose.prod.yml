@@ -1,0 +1,41 @@
+# Compose de PRODUCTION : tire les images depuis GHCR (ne les construit pas).
+# Les secrets (${...}) viennent d'un fichier .env présent sur le serveur.
+services:
+  backend:
+    image: ghcr.io/abdulmvlick/noru-backend:latest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/noru"
+      MONGODB_URI: "mongodb://mongo:27017/noru"
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_EXPIRES_IN: "1d"
+    depends_on:
+      - mysql
+      - mongo
+
+  frontend:
+    image: ghcr.io/abdulmvlick/noru-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: noru
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mysql_data:
+  mongo_data:
