@@ -9,7 +9,9 @@ export interface UtilisateurConnecte {
 // Raccourci : @CurrentUser() me donne l'utilisateur déduit du JWT.
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): UtilisateurConnecte => {
-    const request = ctx.switchToHttp().getRequest<{ user: UtilisateurConnecte }>();
+    const request = ctx
+      .switchToHttp()
+      .getRequest<{ user: UtilisateurConnecte }>();
     return request.user;
   },
 );

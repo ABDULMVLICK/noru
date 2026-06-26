@@ -1,4 +1,10 @@
-import { IsEmail, IsIBAN, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsIBAN,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 // Tous les champs optionnels : on peut modifier seulement ce qu'on veut.
 export class UpdateBeneficiaireDto {
