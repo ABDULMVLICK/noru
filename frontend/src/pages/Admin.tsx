@@ -45,24 +45,24 @@ export default function Admin() {
       <h1 className="text-2xl font-bold mb-6">Espace administrateur</h1>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-2xl font-bold">{stats?.nbTransferts ?? '—'}</p>
-          <p className="text-sm text-gray-500">Transferts</p>
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-xl sm:text-2xl font-bold">{stats?.nbTransferts ?? '—'}</p>
+          <p className="text-xs sm:text-sm text-gray-500">Transferts</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-2xl font-bold">{stats?.nbUtilisateurs ?? '—'}</p>
-          <p className="text-sm text-gray-500">Utilisateurs</p>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-xl sm:text-2xl font-bold">{stats?.nbUtilisateurs ?? '—'}</p>
+          <p className="text-xs sm:text-sm text-gray-500">Utilisateurs</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-2xl font-bold">{stats?.volumeTotalEur ?? '0'} €</p>
-          <p className="text-sm text-gray-500">Volume total</p>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-xl sm:text-2xl font-bold">{stats?.volumeTotalEur ?? '0'} €</p>
+          <p className="text-xs sm:text-sm text-gray-500">Volume total</p>
         </div>
       </div>
 
-      {/* Tous les transferts */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full">
+      {/* Tous les transferts. overflow-x-auto = le tableau défile sur mobile. */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="text-left text-gray-500 text-sm border-b border-gray-200">
               <th className="px-4 py-3 font-semibold">Référence</th>

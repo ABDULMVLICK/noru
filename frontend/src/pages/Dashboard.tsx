@@ -32,62 +32,53 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold">Mes transferts</h1>
         <Link
           to="/nouveau-transfert"
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg text-sm"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg text-sm whitespace-nowrap"
         >
           + Nouvel envoi
         </Link>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        {chargement ? (
-          <p className="text-center text-gray-500 py-8">Chargement…</p>
-        ) : transferts.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">
-            Aucun transfert pour l'instant.
-          </p>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-gray-500 text-sm border-b border-gray-200">
-                <th className="px-4 py-3 font-semibold">Référence</th>
-                <th className="px-4 py-3 font-semibold">Bénéficiaire</th>
-                <th className="px-4 py-3 font-semibold">Montant</th>
-                <th className="px-4 py-3 font-semibold">Statut</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {transferts.map((t) => (
-                <tr key={t.id} className="border-b border-gray-100 text-sm">
-                  <td className="px-4 py-3 font-medium">{t.reference}</td>
-                  <td className="px-4 py-3">{t.beneficiaire.nomComplet}</td>
-                  <td className="px-4 py-3">
-                    {t.montantFcfa} FCFA{' '}
-                    <span className="text-gray-400">→ {t.montantEur} €</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatutBadge statut={t.statut} />
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {t.statut === 'EN_ATTENTE' && (
-                      <button
-                        onClick={() => payer(t.id)}
-                        className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg"
-                      >
-                        Payer
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {chargement ? (
+        <p className="text-center text-gray-500 py-8">Chargement…</p>
+      ) : transferts.length === 0 ? (
+        <p className="text-center text-gray-500 py-8">
+          Aucun transfert pour l'instant.
+        </p>
+      ) : (
+        // Liste de cartes : s'empile sur mobile, reste lisible sur grand écran.
+        <div className="space-y-3">
+          {transferts.map((t) => (
+            <div
+              key={t.id}
+              className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex items-center justify-between gap-3"
+            >
+              <div className="min-w-0">
+                <p className="font-medium truncate">{t.beneficiaire.nomComplet}</p>
+                <p className="text-xs text-gray-400">{t.reference}</p>
+                <p className="text-sm mt-1">
+                  {t.montantFcfa} FCFA{' '}
+                  <span className="text-gray-400">→ {t.montantEur} €</span>
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <StatutBadge statut={t.statut} />
+                {t.statut === 'EN_ATTENTE' && (
+                  <button
+                    onClick={() => payer(t.id)}
+                    className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg"
+                  >
+                    Payer
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
