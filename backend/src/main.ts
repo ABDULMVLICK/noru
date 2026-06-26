@@ -18,8 +18,12 @@ async function bootstrap() {
     }),
   );
 
-  // Autorise le frontend React (port Vite) à appeler l'API.
-  app.enableCors({ origin: 'http://localhost:5173', credentials: true });
+  // Autorise le frontend à appeler l'API. En production, on met l'URL Vercel
+  // dans la variable CORS_ORIGIN ; en local, on autorise le serveur Vite.
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+    credentials: true,
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }

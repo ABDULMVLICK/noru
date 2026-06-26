@@ -1,7 +1,8 @@
-// Adresse de l'API, en chemin relatif. En développement, Vite redirige /api
-// vers http://localhost:3000 (voir vite.config.ts). En production, nginx
-// redirige /api vers le conteneur backend. Dans les deux cas : même origine.
-const BASE = '/api';
+// Adresse de l'API.
+//  - En développement : VITE_API_URL est vide → on utilise "/api" et Vite
+//    redirige vers http://localhost:3000 (voir vite.config.ts).
+//  - En production (Vercel) : VITE_API_URL = URL publique du backend (Railway).
+const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api';
 
 // Récupère le token JWT stocké après connexion.
 function getToken(): string | null {
