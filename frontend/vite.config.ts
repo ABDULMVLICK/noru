@@ -5,4 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // En développement, on redirige les appels /api vers le backend NestJS.
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
 });

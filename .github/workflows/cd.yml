@@ -1,0 +1,58 @@
+name: CD
+
+# Déploiement : se déclenche quand du code arrive sur main (après une CI verte).
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # ---- 1. Construire et publier les images Docker sur GHCR ----
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Connexion à GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ghcr.io/abdulmvlick/noru-backend:latest
+            ghcr.io/abdulmvlick/noru-backend:${{ github.sha }}
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ghcr.io/abdulmvlick/noru-frontend:latest
+            ghcr.io/abdulmvlick/noru-frontend:${{ github.sha }}
+
+  # ---- 2. Se connecter au VPS et redémarrer avec les nouvelles images ----
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déploiement SSH sur le VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/noru
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+            docker image prune -f
