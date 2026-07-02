@@ -1,8 +1,8 @@
 import {
   IsEmail,
-  IsIBAN,
   IsOptional,
   IsString,
+  Length,
   MinLength,
 } from 'class-validator';
 
@@ -18,6 +18,6 @@ export class UpdateBeneficiaireDto {
   email?: string;
 
   @IsOptional()
-  @IsIBAN()
+  @Length(14, 34)
   iban?: string;
 }
