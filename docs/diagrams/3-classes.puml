@@ -1,0 +1,94 @@
+@startuml classes-noru
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+left to right direction
+
+' ----- Enumérations -----
+enum Role {
+  USER
+  ADMIN
+}
+enum StatutTransfert {
+  EN_ATTENTE
+  PAYE
+  ENVOYE
+  RECU
+  ECHEC
+}
+
+' ----- Entités (modèles Prisma) -----
+class Utilisateur {
+  +id : int
+  +email : string
+  +motDePasse : string
+  +nom : string
+  +role : Role
+  +rgpdAccepte : bool
+  +dateCreation : datetime
+}
+class Beneficiaire {
+  +id : int
+  +nomComplet : string
+  +email : string
+  +iban : string
+  +dateCreation : datetime
+}
+class Transfert {
+  +id : int
+  +montantFcfa : decimal
+  +montantEur : decimal
+  +fraisFcfa : decimal
+  +tauxChange : decimal
+  +statut : StatutTransfert
+  +reference : string
+  +dateCreation : datetime
+}
+
+Utilisateur "1" --> "0..*" Beneficiaire : possède
+Utilisateur "1" --> "0..*" Transfert : effectue
+Beneficiaire "1" --> "0..*" Transfert : vise
+
+' ----- Couche services (logique métier) -----
+class AuthService {
+  +register(dto)
+  +login(dto)
+  +supprimerCompte(id)
+}
+class BeneficiairesService {
+  +create() +findAll() +findOne()
+  +update() +remove()
+}
+class TransfertsService {
+  +create() +findAll()
+  +findOne() +payer()
+}
+class AdminService {
+  +findAllTransferts() +findAllUtilisateurs()
+  +changerStatut() +supprimerTransfert()
+  +creerUtilisateur() +changerRole()
+  +supprimerUtilisateur() +stats()
+}
+class NotificationsService {
+  +notifierReception()
+  +findAll()
+}
+class PrismaService
+
+' ----- Couche contrôleurs (API REST) -----
+class AuthController
+class BeneficiairesController
+class TransfertsController
+class AdminController
+
+AuthController --> AuthService
+BeneficiairesController --> BeneficiairesService
+TransfertsController --> TransfertsService
+AdminController --> AdminService
+AdminController --> NotificationsService
+
+AuthService --> PrismaService
+BeneficiairesService --> PrismaService
+TransfertsService --> PrismaService
+AdminService --> PrismaService
+AdminService --> NotificationsService
+@enduml

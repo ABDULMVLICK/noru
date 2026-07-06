@@ -1,0 +1,32 @@
+@startuml deploiement
+title Architecture de déploiement (CI/CD)
+
+actor "Développeur" as Dev
+actor "Utilisateur" as User
+
+node "GitHub" {
+  artifact "Dépôt noru" as Repo
+  component "GitHub Actions\nCI : lint + tests\nCD : build images" as GA
+  artifact "GHCR\n(images Docker)" as GHCR
+}
+
+node "Railway" {
+  component "Backend NestJS\n(conteneur Docker)" as Back
+  database "MySQL" as MySQL
+  database "MongoDB" as Mongo
+}
+
+node "Vercel" {
+  component "Frontend React (SPA)" as Front
+}
+
+Dev --> Repo : git push
+Repo --> GA : déclenche
+GA --> GHCR : publie les images
+GA --> Back : déploiement
+GA --> Front : déploiement
+User --> Front : HTTPS
+Front --> Back : API REST (/api)
+Back --> MySQL : Prisma
+Back --> Mongo : Mongoose
+@enduml

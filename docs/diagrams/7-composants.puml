@@ -1,0 +1,30 @@
+@startuml composants
+title Diagramme de composants
+
+package "Frontend (React / Vercel)" {
+  [Pages] as Pages
+  [Composants réutilisables] as Comps
+  [Module API (fetch + JWT)] as ApiMod
+  Pages --> Comps
+  Pages --> ApiMod
+}
+
+package "Backend (NestJS / Railway)" {
+  [Contrôleurs REST] as Ctrl
+  [Services métier] as Svc
+  [Auth JWT / Guards] as Auth
+  [Prisma (ORM)] as Prisma
+  [Mongoose] as Mongoose
+  Ctrl --> Svc
+  Ctrl ..> Auth
+  Svc --> Prisma
+  Svc --> Mongoose
+}
+
+database "MySQL" as MySQL
+database "MongoDB" as Mongo
+
+ApiMod --> Ctrl : HTTP /api (REST)
+Prisma --> MySQL
+Mongoose --> Mongo
+@enduml

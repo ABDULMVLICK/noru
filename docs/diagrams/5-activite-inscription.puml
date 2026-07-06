@@ -1,0 +1,26 @@
+@startuml activite-inscription
+title Processus d'inscription d'un utilisateur
+
+start
+:L'utilisateur remplit le formulaire\n(nom, email, mot de passe, consentement RGPD);
+if (Données valides ? (format email, mot de passe >= 8)) then (non)
+  :Afficher les erreurs de validation;
+  stop
+else (oui)
+endif
+if (Consentement RGPD accepté ?) then (non)
+  :Refuser : le consentement est obligatoire;
+  stop
+else (oui)
+endif
+if (Email déjà utilisé ?) then (oui)
+  :Erreur : un compte existe déjà;
+  stop
+else (non)
+endif
+:Hacher le mot de passe (bcrypt);
+:Créer l'utilisateur en base;
+:Générer un jeton JWT;
+:Connecter l'utilisateur;
+stop
+@enduml

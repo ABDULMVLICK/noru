@@ -1,0 +1,23 @@
+@startuml sequence-connexion
+title Connexion d'un utilisateur (génération du JWT)
+
+actor Utilisateur
+participant "Frontend\n(React)" as F
+participant "AuthController" as C
+participant "AuthService" as S
+database "MySQL" as DB
+participant "JwtService" as J
+
+Utilisateur -> F : saisit email + mot de passe
+F -> C : POST /api/auth/login
+C -> S : login(dto)
+S -> DB : findUnique(email)
+DB --> S : utilisateur (mot de passe haché)
+S -> S : bcrypt.compare(motDePasse, hash)
+S -> J : signAsync(payload)
+J --> S : jeton JWT
+S --> C : { access_token, utilisateur }
+C --> F : 201 + token
+F -> F : stocke le token (localStorage)
+F --> Utilisateur : accès à l'espace connecté
+@enduml
