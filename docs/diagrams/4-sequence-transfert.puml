@@ -1,0 +1,24 @@
+@startuml sequence-transfert
+title Création d'un transfert
+
+actor Utilisateur
+participant "Frontend\n(React)" as F
+participant "JwtAuthGuard" as G
+participant "TransfertsController" as C
+participant "TransfertsService" as S
+database "MySQL" as DB
+
+Utilisateur -> F : choisit un bénéficiaire + un montant
+F -> C : POST /api/transferts (Authorization: Bearer JWT)
+C -> G : vérifie le jeton JWT
+G --> C : utilisateur authentifié
+C -> S : create(userId, dto)
+S -> DB : findUnique(beneficiaireId)
+DB --> S : bénéficiaire
+S -> S : calcule frais + conversion FCFA→EUR + référence
+S -> DB : create(transfert)  [statut = EN_ATTENTE]
+DB --> S : transfert enregistré
+S --> C : transfert
+C --> F : 201 + transfert
+F --> Utilisateur : transfert affiché (EN_ATTENTE)
+@enduml
