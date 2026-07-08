@@ -1,0 +1,38 @@
+@startuml mcd-noru
+title MCD — Modèle Conceptuel de Données de NORU
+skinparam shadowing false
+
+entity "Utilisateur" as U {
+  id (PK)
+  --
+  email
+  mot_de_passe
+  nom
+  role
+  rgpd_accepte
+  date_creation
+}
+entity "Beneficiaire" as B {
+  id (PK)
+  --
+  nom_complet
+  email
+  iban
+  date_creation
+}
+entity "Transfert" as T {
+  id (PK)
+  --
+  montant_fcfa
+  montant_eur
+  frais_fcfa
+  taux_change
+  statut
+  reference
+  date_creation
+}
+
+U ||--o{ B : possède
+U ||--o{ T : effectue
+B ||--o{ T : vise
+@enduml
