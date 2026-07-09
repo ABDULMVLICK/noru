@@ -20,12 +20,12 @@
 
 ## 1. Diagramme de cas d'utilisation
 
-Acteurs : **Visiteur** (non connecté), **Envoyeur** (utilisateur connecté), **Admin**, **Receveur** (acteur secondaire qui reçoit la notification).
+Acteurs : **Visiteur** (non connecté), **Envoyeur** (utilisateur connecté), **Admin**. Le bénéficiaire n'est pas un acteur du système (il ne s'y connecte pas) : il est simplement notifié par email.
 
 Points clés à défendre à l'oral :
 - L'`Envoyeur` est un `Visiteur` qui s'est connecté → il hérite de « Se connecter ».
-- `Créer un transfert` **inclut** `Faux paiement mobile money` (on ne crée pas un transfert sans le financer).
-- `Changer le statut` **inclut** l'envoi de la `notification` au receveur.
+- `Créer un transfert` **inclut** `Payer par mobile money` (on ne crée pas un transfert sans le financer).
+- `Changer le statut` **inclut** `Notifier le bénéficiaire`.
 
 ## 2. Diagramme d'états-transitions (cycle de vie du Transfert)
 
