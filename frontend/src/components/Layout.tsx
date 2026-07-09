@@ -13,19 +13,19 @@ export default function Layout() {
     const actif = pathname === to;
     return `whitespace-nowrap px-3 py-2 rounded-lg text-sm ${
       actif
-        ? 'bg-emerald-50 text-emerald-800 font-semibold'
-        : 'text-gray-500 hover:bg-gray-100'
+        ? 'bg-brand-100 text-brand-800 font-semibold'
+        : 'text-stone-500 hover:bg-stone-100'
     }`;
   }
 
   return (
     <>
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-brand-50/70 backdrop-blur border-b border-stone-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="h-14 flex items-center justify-between">
             <Link
               to="/"
-              className="text-emerald-600 font-extrabold text-xl tracking-wide"
+              className="text-brand-700 font-extrabold text-xl tracking-wide"
             >
               NORU
             </Link>
@@ -34,7 +34,7 @@ export default function Layout() {
                 deconnexion();
                 navigate('/connexion');
               }}
-              className="text-sm text-gray-500 hover:text-red-600"
+              className="text-sm text-stone-500 hover:text-red-600"
             >
               Déconnexion
             </button>

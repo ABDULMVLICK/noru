@@ -36,16 +36,16 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold">Mes transferts</h1>
         <Link
           to="/nouveau-transfert"
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+          className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-4 py-2 rounded-lg text-sm whitespace-nowrap"
         >
           + Nouvel envoi
         </Link>
       </div>
 
       {chargement ? (
-        <p className="text-center text-gray-500 py-8">Chargement…</p>
+        <p className="text-center text-stone-500 py-8">Chargement…</p>
       ) : transferts.length === 0 ? (
-        <p className="text-center text-gray-500 py-8">
+        <p className="text-center text-stone-500 py-8">
           Aucun transfert pour l'instant.
         </p>
       ) : (
@@ -54,14 +54,14 @@ export default function Dashboard() {
           {transferts.map((t) => (
             <div
               key={t.id}
-              className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex items-center justify-between gap-3"
+              className="bg-white border border-stone-200 rounded-xl shadow-sm p-4 flex items-center justify-between gap-3"
             >
               <div className="min-w-0">
                 <p className="font-medium truncate">{t.beneficiaire.nomComplet}</p>
-                <p className="text-xs text-gray-400">{t.reference}</p>
+                <p className="text-xs text-stone-400">{t.reference}</p>
                 <p className="text-sm mt-1">
                   {t.montantFcfa} FCFA{' '}
-                  <span className="text-gray-400">→ {t.montantEur} €</span>
+                  <span className="text-stone-400">→ {t.montantEur} €</span>
                 </p>
               </div>
               <div className="flex flex-col items-end gap-2 shrink-0">
@@ -69,7 +69,7 @@ export default function Dashboard() {
                 {t.statut === 'EN_ATTENTE' && (
                   <button
                     onClick={() => payer(t.id)}
-                    className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg"
+                    className="text-xs bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 rounded-lg"
                   >
                     Payer
                   </button>

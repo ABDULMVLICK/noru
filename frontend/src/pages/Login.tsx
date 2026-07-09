@@ -21,26 +21,26 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-5">
-      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h1 className="text-3xl font-extrabold tracking-widest text-emerald-600 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-brand-50 p-5">
+      <div className="w-full max-w-sm bg-white border border-stone-200 rounded-xl shadow-sm p-6">
+        <h1 className="text-3xl font-extrabold tracking-widest text-brand-600 text-center">
           NORU
         </h1>
-        <p className="text-center text-gray-500 mb-6">Connectez-vous à votre compte</p>
+        <p className="text-center text-stone-500 mb-6">Connectez-vous à votre compte</p>
 
         <form onSubmit={soumettre} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-1">Email</label>
+            <label className="block text-sm font-semibold text-stone-600 mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-brand-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-1">
+            <label className="block text-sm font-semibold text-stone-600 mb-1">
               Mot de passe
             </label>
             <input
@@ -48,7 +48,7 @@ export default function Login() {
               value={motDePasse}
               onChange={(e) => setMotDePasse(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-brand-500"
             />
           </div>
 
@@ -56,15 +56,15 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg"
+            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg"
           >
             Se connecter
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm text-stone-500 mt-4">
           Pas de compte ?{' '}
-          <Link to="/inscription" className="text-emerald-600 font-medium">
+          <Link to="/inscription" className="text-brand-600 font-medium">
             S'inscrire
           </Link>
         </p>

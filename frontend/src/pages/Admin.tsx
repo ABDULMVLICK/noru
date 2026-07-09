@@ -97,7 +97,7 @@ export default function Admin() {
   }
 
   const champ =
-    'w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500';
+    'w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-brand-500';
 
   return (
     <div>
@@ -105,26 +105,26 @@ export default function Admin() {
 
       {/* Statistiques */}
       <div className="grid grid-cols-3 gap-3 mb-8">
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-white border border-stone-200 rounded-xl p-4">
           <p className="text-xl sm:text-2xl font-bold">{stats?.nbTransferts ?? '—'}</p>
-          <p className="text-xs sm:text-sm text-gray-500">Transferts</p>
+          <p className="text-xs sm:text-sm text-stone-500">Transferts</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-white border border-stone-200 rounded-xl p-4">
           <p className="text-xl sm:text-2xl font-bold">{stats?.nbUtilisateurs ?? '—'}</p>
-          <p className="text-xs sm:text-sm text-gray-500">Utilisateurs</p>
+          <p className="text-xs sm:text-sm text-stone-500">Utilisateurs</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-brand-600 border border-brand-600 rounded-xl p-4 text-white">
           <p className="text-xl sm:text-2xl font-bold">{stats?.volumeTotalEur ?? '0'} €</p>
-          <p className="text-xs sm:text-sm text-gray-500">Volume total</p>
+          <p className="text-xs sm:text-sm text-brand-100">Volume total</p>
         </div>
       </div>
 
       {/* Transferts */}
       <h2 className="text-lg font-semibold mb-3">Tous les transferts</h2>
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-x-auto mb-8">
+      <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-x-auto mb-8">
         <table className="w-full min-w-[720px]">
           <thead>
-            <tr className="text-left text-gray-500 text-sm border-b border-gray-200">
+            <tr className="text-left text-stone-500 text-sm border-b border-stone-200">
               <th className="px-4 py-3 font-semibold">Référence</th>
               <th className="px-4 py-3 font-semibold">Envoyeur</th>
               <th className="px-4 py-3 font-semibold">Bénéficiaire</th>
@@ -135,7 +135,7 @@ export default function Admin() {
           </thead>
           <tbody>
             {transferts.map((t) => (
-              <tr key={t.id} className="border-b border-gray-100 text-sm">
+              <tr key={t.id} className="border-b border-stone-100 text-sm">
                 <td className="px-4 py-3 font-medium">{t.reference}</td>
                 <td className="px-4 py-3">{t.utilisateur.email}</td>
                 <td className="px-4 py-3">{t.beneficiaire.nomComplet}</td>
@@ -148,7 +148,7 @@ export default function Admin() {
                     <select
                       value={t.statut}
                       onChange={(e) => changerStatut(t.id, e.target.value)}
-                      className="border border-gray-200 rounded-lg px-2 py-1 text-sm"
+                      className="border border-stone-200 rounded-lg px-2 py-1 text-sm"
                     >
                       {STATUTS.map((s) => (
                         <option key={s} value={s}>
@@ -158,7 +158,7 @@ export default function Admin() {
                     </select>
                     <button
                       onClick={() => supprimerTransfert(t.id)}
-                      className="text-sm text-gray-400 hover:text-red-600"
+                      className="text-sm text-stone-400 hover:text-red-600"
                     >
                       Supprimer
                     </button>
@@ -176,7 +176,7 @@ export default function Admin() {
       {/* Formulaire de création */}
       <form
         onSubmit={creerUtilisateur}
-        className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-4 grid gap-3 sm:grid-cols-5"
+        className="bg-white border border-stone-200 rounded-xl shadow-sm p-4 mb-4 grid gap-3 sm:grid-cols-5"
       >
         <input placeholder="Nom" value={nom} onChange={(e) => setNom(e.target.value)} required className={champ} />
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className={champ} />
@@ -185,17 +185,17 @@ export default function Admin() {
           <option value="USER">USER</option>
           <option value="ADMIN">ADMIN</option>
         </select>
-        <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg">
+        <button type="submit" className="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 rounded-lg">
           Ajouter
         </button>
       </form>
       {erreur && <p className="text-sm text-red-600 mb-4">{erreur}</p>}
 
       {/* Liste des utilisateurs */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-x-auto">
+      <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-x-auto">
         <table className="w-full min-w-[560px]">
           <thead>
-            <tr className="text-left text-gray-500 text-sm border-b border-gray-200">
+            <tr className="text-left text-stone-500 text-sm border-b border-stone-200">
               <th className="px-4 py-3 font-semibold">Nom</th>
               <th className="px-4 py-3 font-semibold">Email</th>
               <th className="px-4 py-3 font-semibold">Rôle</th>
@@ -204,14 +204,14 @@ export default function Admin() {
           </thead>
           <tbody>
             {utilisateurs.map((u) => (
-              <tr key={u.id} className="border-b border-gray-100 text-sm">
+              <tr key={u.id} className="border-b border-stone-100 text-sm">
                 <td className="px-4 py-3 font-medium">{u.nom}</td>
                 <td className="px-4 py-3">{u.email}</td>
                 <td className="px-4 py-3">
                   <select
                     value={u.role}
                     onChange={(e) => changerRole(u.id, e.target.value)}
-                    className="border border-gray-200 rounded-lg px-2 py-1 text-sm"
+                    className="border border-stone-200 rounded-lg px-2 py-1 text-sm"
                   >
                     <option value="USER">USER</option>
                     <option value="ADMIN">ADMIN</option>
@@ -219,11 +219,11 @@ export default function Admin() {
                 </td>
                 <td className="px-4 py-3">
                   {u.id === utilisateur?.id ? (
-                    <span className="text-xs text-gray-400">(vous)</span>
+                    <span className="text-xs text-stone-400">(vous)</span>
                   ) : (
                     <button
                       onClick={() => supprimerUtilisateur(u.id)}
-                      className="text-sm text-gray-400 hover:text-red-600"
+                      className="text-sm text-stone-400 hover:text-red-600"
                     >
                       Supprimer
                     </button>

@@ -46,7 +46,7 @@ export default function Beneficiaires() {
   }
 
   const champ =
-    'w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500';
+    'w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-brand-500';
 
   return (
     <div>
@@ -54,7 +54,7 @@ export default function Beneficiaires() {
 
       <div className="grid md:grid-cols-2 gap-5">
         {/* Formulaire d'ajout */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-fit">
+        <div className="bg-white border border-stone-200 rounded-xl shadow-sm p-6 h-fit">
           <h2 className="font-semibold mb-4">Ajouter un bénéficiaire</h2>
           <form onSubmit={ajouter} className="space-y-3">
             <input
@@ -82,7 +82,7 @@ export default function Beneficiaires() {
             {erreur && <p className="text-sm text-red-600">{erreur}</p>}
             <button
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg"
+              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg"
             >
               Ajouter
             </button>
@@ -90,25 +90,36 @@ export default function Beneficiaires() {
         </div>
 
         {/* Liste */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-white border border-stone-200 rounded-xl shadow-sm p-6">
           <h2 className="font-semibold mb-4">Liste ({liste.length})</h2>
           {liste.length === 0 ? (
-            <p className="text-gray-500 text-sm">Aucun bénéficiaire.</p>
+            <p className="text-stone-500 text-sm">Aucun bénéficiaire.</p>
           ) : (
             <ul className="space-y-3">
               {liste.map((b) => (
                 <li
                   key={b.id}
-                  className="flex items-center justify-between border-b border-gray-100 pb-3"
+                  className="flex items-center justify-between border-b border-stone-100 pb-3"
                 >
-                  <div>
-                    <p className="font-medium">{b.nomComplet}</p>
-                    <p className="text-sm text-gray-500">{b.email}</p>
-                    <p className="text-xs text-gray-400">{b.iban}</p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Avatar : les initiales du bénéficiaire dans un rond crème */}
+                    <span className="shrink-0 w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold">
+                      {b.nomComplet
+                        .split(' ')
+                        .map((mot) => mot[0])
+                        .join('')
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{b.nomComplet}</p>
+                      <p className="text-sm text-stone-500 truncate">{b.email}</p>
+                      <p className="text-xs text-stone-400 truncate">{b.iban}</p>
+                    </div>
                   </div>
                   <button
                     onClick={() => supprimer(b.id)}
-                    className="text-sm text-gray-400 hover:text-red-600"
+                    className="text-sm text-stone-400 hover:text-red-600"
                   >
                     Supprimer
                   </button>
