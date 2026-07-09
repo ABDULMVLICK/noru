@@ -1,14 +1,31 @@
 @import "tailwindcss";
 
+/* Palette "brand" = les marrons de NORU (charte crème & marron).
+   Définie ici une seule fois, elle rend utilisables les classes
+   bg-brand-600, text-brand-700, border-brand-200, etc. partout. */
+@theme {
+  --color-brand-50: #f8f1e9;
+  --color-brand-100: #efe0cf;
+  --color-brand-200: #e2c5a5;
+  --color-brand-300: #d0a578;
+  --color-brand-400: #b9834f;
+  --color-brand-500: #9d6636;
+  --color-brand-600: #855432; /* couleur principale : boutons, liens */
+  --color-brand-700: #6d4529; /* survol des boutons */
+  --color-brand-800: #573620;
+  --color-brand-900: #402819;
+}
+
 /* On force le thème clair (sinon le navigateur peut afficher un fond sombre). */
 html {
   color-scheme: light;
 }
 
-/* Police et fond de base. Le reste du style se fait avec les classes
-   utilitaires Tailwind directement dans les composants. */
+/* Police et fond de base. Fond crème chaud, texte marron très foncé.
+   Le reste du style se fait avec les classes utilitaires Tailwind
+   (marrons = brand-*, gris chauds = stone-*) dans les composants. */
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background-color: #f9fafb;
-  color: #18211e;
+  background-color: #ece4d9;
+  color: #2b2622;
 }
