@@ -1,0 +1,50 @@
+@startuml mld-noru
+title MLD — Modèle Logique de Données de NORU
+skinparam shadowing false
+skinparam linetype ortho
+
+entity "utilisateur" as U {
+  * id : INT <<PK>>
+  --
+  * email : VARCHAR(180) <<UNIQUE>>
+  * mot_de_passe : VARCHAR(255)
+  * nom : VARCHAR(100)
+  * role : ENUM('USER','ADMIN')
+  * rgpd_accepte : BOOLEAN
+  * date_creation : DATETIME
+}
+
+entity "beneficiaire" as B {
+  * id : INT <<PK>>
+  --
+  * nom_complet : VARCHAR(150)
+  * email : VARCHAR(180)
+  * iban : VARCHAR(34)
+  * utilisateur_id : INT <<FK>>
+  date_creation : DATETIME
+}
+
+entity "transfert" as T {
+  * id : INT <<PK>>
+  --
+  * montant_fcfa : DECIMAL(12,2)
+  * montant_eur : DECIMAL(12,2)
+  * frais_fcfa : DECIMAL(12,2)
+  * taux_change : DECIMAL(10,6)
+  * statut : ENUM('EN_ATTENTE','PAYE','ENVOYE','RECU','ECHEC')
+  * reference : VARCHAR(30) <<UNIQUE>>
+  * utilisateur_id : INT <<FK>>
+  * beneficiaire_id : INT <<FK>>
+  date_creation : DATETIME
+}
+
+U ||--o{ B : possède
+U ||--o{ T : effectue
+B ||--o{ T : vise
+
+note bottom of T
+  Collection MongoDB « notifications » (NoSQL) :
+  type, destinataire, sujet, contenu,
+  transfert_id, statut_envoi, date_envoi
+end note
+@enduml
