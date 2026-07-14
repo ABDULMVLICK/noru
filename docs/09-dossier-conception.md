@@ -22,7 +22,7 @@ Enfin, ce projet a été l'occasion de mettre en pratique, de bout en bout, l'en
 
 ## 1.1 Présentation générale
 
-NORU est une application web de **simulation** de transfert d'argent du Bénin vers la France. Elle reproduit, dans un cadre pédagogique, le fonctionnement d'un service de transfert d'argent moderne : un envoyeur crée un compte, enregistre des bénéficiaires, initie un transfert d'un montant exprimé en francs CFA (FCFA) converti en euros, effectue un paiement mobile money simulé, et le bénéficiaire est notifié par courrier électronique. Un espace administrateur permet de superviser l'activité, de faire évoluer le statut des opérations et de gérer les comptes.
+NORU est une application web de transfert d'argent du Bénin vers la France. Elle reproduit le fonctionnement d'un service de transfert d'argent moderne : un envoyeur crée un compte, enregistre des bénéficiaires, initie un transfert d'un montant exprimé en francs CFA (FCFA) converti en euros, le règle par mobile money, et le bénéficiaire est notifié par courrier électronique. Un espace administrateur permet de superviser l'activité, de faire évoluer le statut des opérations et de gérer les comptes.
 
 Le nom « NORU » évoque un service simple et direct, à l'image de l'objectif du projet : rendre l'envoi d'argent aussi fluide que possible, tout en garantissant la sécurité des données et la fiabilité du service.
 
@@ -34,11 +34,11 @@ Les solutions existantes présentent plusieurs limites perçues par les utilisat
 
 NORU répond à ce besoin en proposant un parcours minimaliste : quelques écrans, une conversion affichée en temps réel, un suivi clair du statut de chaque transfert.
 
-## 1.3 Nature de simulation du projet
+## 1.3 Un prototype fonctionnel en attente d'autorisations
 
-NORU est **explicitement une simulation pédagogique**. Aucun flux financier réel n'est traité : le paiement mobile money est simulé, et le virement vers le compte bancaire du bénéficiaire n'est pas exécuté — seule une notification est envoyée. Ce cadrage, défini dès le cahier des charges, est un choix assumé : il écarte volontairement la conformité bancaire réelle (PCI-DSS, KYC, lutte anti-blanchiment), qui relève d'établissements agréés, tout en implémentant l'intégralité de la mécanique applicative attendue d'un tel service.
+NORU est un **prototype pleinement fonctionnel** : toute la mécanique applicative d'un service de transfert est développée (comptes, bénéficiaires, conversion, cycle de vie des transferts, supervision). Le circuit de paiement est en place, mais **désactivé en attente des autorisations réglementaires** — notamment l'agrément d'établissement de monnaie électronique délivré par la BCEAO dans la zone UEMOA — **et des accords commerciaux avec les opérateurs mobile money** (MTN MoMo, Moov Money) pour l'usage de leurs API. À ce stade, **aucun flux financier réel n'est donc traité** : le paiement et le virement vers le compte bancaire du bénéficiaire ne sont pas exécutés, seule une notification est envoyée.
 
-Ce parti pris présente un double avantage : il concentre l'effort sur les compétences visées par le titre (conception, développement, sécurité applicative, tests, déploiement) et il évite de prétendre à des garanties que le projet ne peut pas tenir. La transparence sur la nature de simulation fait partie intégrante de la démarche.
+Ce cadrage, défini dès le cahier des charges, est un choix assumé et réaliste : lancer réellement le service supposerait aussi la conformité bancaire (KYC, lutte anti-blanchiment/LCB-FT) qui relève d'établissements agréés. Ce parti pris concentre l'effort sur les compétences visées par le titre (conception, développement, sécurité applicative, tests, déploiement), tout en gardant une architecture **prête à être branchée** dès l'obtention des autorisations. La transparence sur cet état d'avancement fait partie intégrante de la démarche.
 
 ## 1.4 Objectifs du projet
 
@@ -69,7 +69,7 @@ Plusieurs types d'acteurs interviennent sur ce marché :
 
 ## 2.3 Positionnement de NORU
 
-NORU ne prétend pas concurrencer ces acteurs sur le plan opérationnel — il s'agit d'une simulation. En revanche, son positionnement conceptuel est clair : la **simplicité radicale** et la **transparence**. L'utilisateur voit immédiatement le montant envoyé, les frais, et le montant reçu en euros, sans jargon ni étape superflue. Ce positionnement guide l'ensemble des choix de conception : un nombre d'écrans réduit, une conversion affichée en direct, un suivi de statut lisible, et une interface épurée aux couleurs rassurantes.
+NORU ne prétend pas, à ce stade, concurrencer ces acteurs sur le plan opérationnel — c'est un prototype dont le circuit de paiement attend ses autorisations. En revanche, son positionnement conceptuel est clair : la **simplicité radicale** et la **transparence**. L'utilisateur voit immédiatement le montant envoyé, les frais, et le montant reçu en euros, sans jargon ni étape superflue. Ce positionnement guide l'ensemble des choix de conception : un nombre d'écrans réduit, une conversion affichée en direct, un suivi de statut lisible, et une interface épurée aux couleurs rassurantes.
 
 ```{=openxml}
 <w:p><w:r><w:br w:type="page"/></w:r></w:p>
@@ -133,7 +133,7 @@ De l'analyse des personas et du contexte découlent les besoins fonctionnels sui
 2. **Se connecter** : authentification donnant accès à un espace personnel sécurisé.
 3. **Gérer ses bénéficiaires** : ajouter, lister et supprimer des bénéficiaires, chacun caractérisé par un nom complet, un email et un IBAN.
 4. **Créer un transfert** : choisir un bénéficiaire, saisir un montant en FCFA, et visualiser en temps réel la conversion en euros ainsi que les frais.
-5. **Payer et suivre** : effectuer un paiement mobile money simulé, puis suivre l'évolution du statut du transfert.
+5. **Payer et suivre** : régler le transfert par mobile money, puis suivre l'évolution de son statut.
 6. **Notifier le bénéficiaire** : envoyer une notification par email lorsque le transfert est reçu.
 7. **Superviser (administrateur)** : accéder à l'ensemble des transferts et des utilisateurs, faire évoluer les statuts, gérer les comptes et consulter des statistiques.
 
@@ -157,7 +157,7 @@ Le périmètre fonctionnel se décompose en cinq grands ensembles :
 
 - **F1 — Authentification et compte** : inscription, connexion (par jeton JWT), suppression de compte au titre du droit à l'effacement.
 - **F2 — Bénéficiaires** : création, consultation et suppression des bénéficiaires propres à chaque utilisateur.
-- **F3 — Transferts** : création d'un transfert avec conversion FCFA→EUR et calcul des frais, paiement simulé, consultation de la liste et du détail, suivi du statut.
+- **F3 — Transferts** : création d'un transfert avec conversion FCFA→EUR et calcul des frais, paiement par mobile money, consultation de la liste et du détail, suivi du statut.
 - **F4 — Notification** : envoi d'une notification par email au bénéficiaire.
 - **F5 — Administration** : supervision de l'ensemble des transferts et des utilisateurs, changement de statut, opérations de création, de changement de rôle et de suppression sur les utilisateurs et les transferts, statistiques.
 
@@ -171,10 +171,10 @@ Le périmètre fonctionnel se décompose en cinq grands ensembles :
 | US-04 | envoyeur | voir / modifier / supprimer mes bénéficiaires | garder ma liste à jour | Moyenne |
 | US-05 | envoyeur | créer un transfert (bénéficiaire + montant FCFA) | envoyer de l'argent | Haute |
 | US-06 | envoyeur | voir le montant en euros et les frais avant de valider | savoir ce que le bénéficiaire recevra | Haute |
-| US-07 | envoyeur | effectuer un paiement mobile money (simulé) | financer mon transfert | Haute |
+| US-07 | envoyeur | régler mon transfert par mobile money | financer mon transfert | Haute |
 | US-08 | envoyeur | consulter la liste de mes transferts et leurs statuts | suivre mes envois | Haute |
 | US-09 | envoyeur | voir le détail d'un transfert | vérifier les informations | Moyenne |
-| US-10 | receveur | recevoir un email de notification | être prévenu qu'un transfert arrive | Haute |
+| US-10 | bénéficiaire | recevoir un email de notification | être prévenu qu'un transfert arrive | Haute |
 | US-11 | utilisateur | supprimer mon compte et mes données | exercer mon droit à l'effacement | Moyenne |
 | US-12 | admin | consulter tous les transferts et utilisateurs | superviser l'activité | Haute |
 | US-13 | admin | changer le statut d'un transfert | gérer le cycle de vie | Haute |
@@ -191,7 +191,7 @@ Chaque user story donne lieu à des **critères d'acceptation** vérifiables. Pa
 
 ## 5.4 Hors-périmètre
 
-Sont explicitement exclus de cette version : le vrai paiement et la vraie passerelle bancaire (simulés), le vrai virement vers l'IBAN (simulé), la conformité bancaire réelle (PCI-DSS, KYC, anti-blanchiment), l'application mobile native (le web responsive en tient lieu), le multi-devises (seul le couple FCFA→EUR est géré) et le compte pour le receveur (qui reçoit seulement un email).
+Sont hors du périmètre de cette version — et constituent les étapes d'un lancement réel : le paiement réel via les API des opérateurs (MTN MoMo, Moov) et le virement bancaire vers l'IBAN, tous deux subordonnés à l'**agrément d'établissement de paiement (BCEAO / UEMOA)** et à la conformité **KYC / LCB-FT** ; l'application mobile native (le web responsive en tient lieu) ; le multi-devises (seul le couple FCFA→EUR est géré) ; et un compte dédié pour le bénéficiaire (qui reçoit seulement un email).
 
 ## 5.5 Livrables
 
@@ -211,7 +211,7 @@ Cette démarche progressive présente l'avantage de valider l'ergonomie et la na
 
 ## 6.2 Parcours utilisateur
 
-Le parcours principal de l'envoyeur est le suivant : inscription ou connexion → tableau de bord listant ses transferts → ajout d'un bénéficiaire → création d'un transfert (choix du bénéficiaire, saisie du montant, visualisation de la conversion) → paiement simulé → suivi du statut. L'espace administrateur ajoute un parcours de supervision : consultation de tous les transferts, changement de statut, gestion des utilisateurs.
+Le parcours principal de l'envoyeur est le suivant : inscription ou connexion → tableau de bord listant ses transferts → ajout d'un bénéficiaire → création d'un transfert (choix du bénéficiaire, saisie du montant, visualisation de la conversion) → paiement par mobile money → suivi du statut. L'espace administrateur ajoute un parcours de supervision : consultation de tous les transferts, changement de statut, gestion des utilisateurs.
 
 ## 6.3 Charte graphique
 
@@ -241,13 +241,13 @@ La modélisation UML a permis de formaliser la structure et le comportement de l
 
 ![Diagramme de cas d'utilisation](diagrams/img/1-cas-utilisation.png)
 
-Ce diagramme répond à la question « qui peut faire quoi ? ». Il fait apparaître quatre acteurs : le **Visiteur** (non connecté), l'**Envoyeur** (utilisateur connecté), l'**Administrateur** et le **Receveur** (acteur secondaire, destinataire de la notification). L'Envoyeur est un Visiteur qui s'est connecté : il hérite donc du cas d'usage « se connecter ». Deux relations d'inclusion sont notables : « créer un transfert » inclut « effectuer le paiement » (on ne crée pas un transfert sans le financer), et « changer le statut » inclut « recevoir une notification » (le passage au statut « reçu » déclenche l'email).
+Ce diagramme répond à la question « qui peut faire quoi ? ». Il fait apparaître trois acteurs : le **Visiteur** (non connecté), l'**Envoyeur** (utilisateur connecté) et l'**Administrateur**. Le bénéficiaire n'est pas un acteur du système — il ne s'y connecte pas —, il est seulement notifié par email. L'Envoyeur est un Visiteur qui s'est connecté : il hérite donc du cas d'usage « se connecter ». Deux relations d'inclusion sont notables : « créer un transfert » inclut « payer par mobile money » (on ne crée pas un transfert sans le financer), et « changer le statut » inclut « notifier le bénéficiaire » (le passage au statut « reçu » déclenche l'email).
 
 ## 7.2 Diagramme d'états-transitions
 
 ![Diagramme d'états-transitions du transfert](diagrams/img/2-etats-transfert.png)
 
-Ce diagramme modélise le **cycle de vie d'un transfert**, qui est le cœur métier de l'application. Un transfert naît au statut `EN_ATTENTE`, passe à `PAYE` après le paiement simulé, puis à `ENVOYE` lors du traitement, et enfin à `RECU` lorsque l'administrateur marque la réception (ce qui notifie le bénéficiaire). Une branche `ECHEC` gère les cas d'erreur (paiement refusé, incident de traitement). Ce diagramme se traduit directement dans le code par le champ `statut` de la table `transfert`, typé en `ENUM`, et par les règles qui encadrent les transitions (par exemple, un transfert déjà payé ne peut pas être payé de nouveau).
+Ce diagramme modélise le **cycle de vie d'un transfert**, qui est le cœur métier de l'application. Un transfert naît au statut `EN_ATTENTE`, passe à `PAYE` après le paiement par mobile money, puis à `ENVOYE` lors du traitement, et enfin à `RECU` lorsque l'administrateur marque la réception (ce qui notifie le bénéficiaire). Une branche `ECHEC` gère les cas d'erreur (paiement refusé, incident de traitement). Ce diagramme se traduit directement dans le code par le champ `statut` de la table `transfert`, typé en `ENUM`, et par les règles qui encadrent les transitions (par exemple, un transfert déjà payé ne peut pas être payé de nouveau).
 
 ## 7.3 Diagramme de classes
 
@@ -451,7 +451,7 @@ Cette section présente brièvement chaque technologie mobilisée et sa contribu
 
 ## 11.1 Backend (NestJS)
 
-Le backend est organisé en modules, chacun regroupant un contrôleur, un service et ses objets de transfert. Le module **Auth** gère l'inscription (avec hachage bcrypt du mot de passe), la connexion (avec génération d'un jeton JWT) et la suppression de compte (droit à l'effacement). Le module **Beneficiaires** gère les opérations CRUD sur les bénéficiaires, avec un contrôle strict d'appartenance : un utilisateur n'accède qu'à ses propres bénéficiaires. Le module **Transferts** porte la logique métier : à la création, il vérifie l'appartenance du bénéficiaire, calcule les frais (2 % du montant) et la conversion FCFA→EUR (au taux fixe de 655,957), génère une référence unique, et enregistre le transfert au statut initial ; il gère aussi le paiement simulé et le passage de statut. Le module **Admin** offre la supervision et les opérations CRUD sur les utilisateurs et les transferts, protégées par un rôle administrateur. Le module **Notifications** enregistre les notifications dans MongoDB et prépare l'email (dont l'envoi réel est prévu en évolution).
+Le backend est organisé en modules, chacun regroupant un contrôleur, un service et ses objets de transfert. Le module **Auth** gère l'inscription (avec hachage bcrypt du mot de passe), la connexion (avec génération d'un jeton JWT) et la suppression de compte (droit à l'effacement). Le module **Beneficiaires** gère les opérations CRUD sur les bénéficiaires, avec un contrôle strict d'appartenance : un utilisateur n'accède qu'à ses propres bénéficiaires. Le module **Transferts** porte la logique métier : à la création, il vérifie l'appartenance du bénéficiaire, calcule les frais (2 % du montant) et la conversion FCFA→EUR (au taux fixe de 655,957), génère une référence unique, et enregistre le transfert au statut initial ; il gère aussi le paiement par mobile money et le passage de statut. Le module **Admin** offre la supervision et les opérations CRUD sur les utilisateurs et les transferts, protégées par un rôle administrateur. Le module **Notifications** enregistre les notifications dans MongoDB et prépare l'email (dont l'envoi réel est prévu en évolution).
 
 ## 11.2 Frontend (React)
 
@@ -535,7 +535,7 @@ La mise en production a donné lieu à plusieurs incidents, résolus en suivant 
 
 Le traitement des données personnelles respecte les principes du RGPD : **consentement** explicite obligatoire à l'inscription, **droit à l'effacement** (suppression du compte et de toutes ses données), **minimisation** (seules les données nécessaires sont collectées), et **sécurité** (mots de passe hachés, secrets hors du dépôt).
 
-Concernant la notification par email, le système enregistre chaque notification dans la base et prépare le message ; l'**envoi réel via un service SMTP constitue une évolution prévue** — dans la version actuelle, cet envoi est simulé, ce qui est cohérent avec la nature de simulation du projet.
+Concernant la notification par email, le système enregistre chaque notification dans la base et prépare le message ; l'**envoi réel via un service SMTP constitue une évolution prévue** — dans la version actuelle, cet envoi n'est pas encore branché, ce qui est cohérent avec l'état de prototype du projet.
 
 ## 15.2 Accessibilité (RGAA)
 
