@@ -17,6 +17,7 @@ interface AuthContexte {
     rgpdAccepte: boolean,
   ) => Promise<void>;
   deconnexion: () => void;
+  supprimerCompte: () => Promise<void>;
 }
 
 const Contexte = createContext<AuthContexte>(null!);
@@ -64,9 +65,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUtilisateur(null);
   }
 
+  // Droit à l'effacement (RGPD) : supprime le compte et toutes ses données
+  // côté serveur, puis nettoie la session côté navigateur.
+  async function supprimerCompte() {
+    await api('/auth/me', { method: 'DELETE' });
+    deconnexion();
+  }
+
   return (
     <Contexte.Provider
-      value={{ utilisateur, connexion, inscription, deconnexion }}
+      value={{ utilisateur, connexion, inscription, deconnexion, supprimerCompte }}
     >
       {children}
     </Contexte.Provider>

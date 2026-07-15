@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import StatutBadge from '../components/StatutBadge';
 
 interface Transfert {
@@ -13,8 +14,11 @@ interface Transfert {
 }
 
 export default function Dashboard() {
+  const { supprimerCompte } = useAuth();
+  const navigate = useNavigate();
   const [transferts, setTransferts] = useState<Transfert[]>([]);
   const [chargement, setChargement] = useState(true);
+  const [erreur, setErreur] = useState('');
 
   async function charger() {
     setTransferts(await api('/transferts'));
@@ -28,6 +32,24 @@ export default function Dashboard() {
   async function payer(id: number) {
     await api(`/transferts/${id}/payer`, { method: 'PATCH' });
     charger();
+  }
+
+  // Droit à l'effacement (RGPD) : on demande confirmation car c'est irréversible.
+  async function supprimer() {
+    if (
+      !confirm(
+        'Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.',
+      )
+    ) {
+      return;
+    }
+    setErreur('');
+    try {
+      await supprimerCompte();
+      navigate('/connexion');
+    } catch (err) {
+      setErreur((err as Error).message);
+    }
   }
 
   return (
@@ -79,6 +101,22 @@ export default function Dashboard() {
           ))}
         </div>
       )}
+
+      {/* Mon compte — droit à l'effacement prévu par le RGPD. */}
+      <div className="mt-10 bg-white border border-stone-200 rounded-xl p-5">
+        <h2 className="font-semibold">Mon compte</h2>
+        <p className="text-sm text-stone-500 mt-1 mb-3">
+          Conformément au RGPD, vous pouvez supprimer votre compte à tout moment.
+          Vos bénéficiaires et vos transferts seront définitivement effacés.
+        </p>
+        {erreur && <p className="text-sm text-red-600 mb-2">{erreur}</p>}
+        <button
+          onClick={supprimer}
+          className="text-sm font-medium border border-red-300 text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg"
+        >
+          Supprimer mon compte
+        </button>
+      </div>
     </div>
   );
 }
