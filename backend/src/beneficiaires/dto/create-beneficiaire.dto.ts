@@ -8,9 +8,9 @@ export class CreateBeneficiaireDto {
   @IsEmail({}, { message: "L'email du bénéficiaire n'est pas valide" })
   email: string;
 
-  // NORU est une simulation : on accepte tout IBAN plausible (contrôle de
-  // longueur). Dans une vraie application bancaire, on validerait la clé de
-  // contrôle de l'IBAN avec @IsIBAN.
+  // Tant que le circuit bancaire n'est pas branché, on se limite à un contrôle
+  // de longueur. La validation de la clé de contrôle de l'IBAN (@IsIBAN) sera
+  // activée lors du raccordement au partenaire bancaire.
   @Length(14, 34, { message: "L'IBAN doit contenir entre 14 et 34 caractères" })
   iban: string;
 }

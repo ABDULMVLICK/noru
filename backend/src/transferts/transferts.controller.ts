@@ -40,7 +40,7 @@ export class TransfertsController {
     return this.service.findOne(user.id, id);
   }
 
-  // Simule le paiement mobile money.
+  // Enregistre le paiement mobile money du transfert.
   @Patch(':id/payer')
   payer(
     @CurrentUser() user: UtilisateurConnecte,

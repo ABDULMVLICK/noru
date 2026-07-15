@@ -61,7 +61,9 @@ export class TransfertsService {
     return transfert;
   }
 
-  // Faux paiement mobile money : EN_ATTENTE -> PAYE.
+  // Paiement mobile money : EN_ATTENTE -> PAYE.
+  // L'appel réel aux API opérateurs (MTN MoMo, Moov) sera branché ici une fois
+  // l'agrément obtenu ; aujourd'hui on enregistre seulement le changement d'état.
   async payer(utilisateurId: number, id: number) {
     const transfert = await this.findOne(utilisateurId, id);
     if (transfert.statut !== 'EN_ATTENTE') {

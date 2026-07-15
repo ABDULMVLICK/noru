@@ -1,7 +1,7 @@
 # NORU — Cahier des charges
 
 > Document contractuel décrivant ce qui sera livré. Projet final CDA.
-> Version 1.0 — Auteur : Abdulmalick Seibou.
+> Version 1.0 — Auteur : Abdou malick Seibou.
 
 ---
 
