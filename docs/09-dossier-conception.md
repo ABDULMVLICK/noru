@@ -215,17 +215,39 @@ Le parcours principal de l'envoyeur est le suivant : inscription ou connexion �
 
 ## 6.3 Charte graphique
 
-La charte graphique a été pensée pour évoquer la **confiance** et la **simplicité**, valeurs essentielles pour un service financier.
+La charte graphique a été pensée pour évoquer la **confiance**, la **chaleur** et la **simplicité**, valeurs essentielles pour un service financier destiné à des transferts familiaux.
 
-- **Palette de couleurs** : une dominante de vert émeraude (couleur associée à la fiabilité et à l'argent), déclinée en plusieurs tons, complétée par des neutres (blancs, gris) pour le fond et le texte, et par des couleurs sémantiques pour les statuts (gris pour « en attente », bleu pour « payé », ambre pour « envoyé », vert pour « reçu », rouge pour « échec »).
+- **Palette de couleurs** : une dominante de **marron chaud** (`#855432`, couleur principale des actions et de l'identité), posée sur un **fond crème** (`#ece4d9`) et des cartes blanches. Les neutres sont des **gris chauds** (et non froids), cohérents avec l'ambiance beige. Les statuts conservent des couleurs sémantiques : gris pour « en attente », bleu pour « payé », ambre pour « envoyé », vert pour « reçu », rouge pour « échec ».
 - **Typographie** : une police sans-serif système, lisible et moderne, avec une hiérarchie claire entre les titres (poids fort) et le corps de texte.
-- **Composants réutilisables** : boutons, champs de saisie, cartes, badges de statut, barre de navigation — chacun décliné dans ses différents états (normal, survol, désactivé, erreur).
+- **Composants réutilisables** : boutons, champs de saisie, cartes, badges de statut, barre de navigation, avatars à initiales — chacun décliné dans ses différents états (normal, survol, désactivé, erreur).
 
-## 6.4 Accessibilité
+Cette palette est centralisée dans un **jeu de variables de thème** (`index.css`) : l'ensemble de l'identité visuelle peut être modifié depuis un seul endroit, sans toucher aux composants.
+
+## 6.4 Maquettes haute fidélité
+
+Les maquettes ci-dessous présentent les quatre écrans de l'espace connecté, déclinés en versions **desktop** et **mobile**. Elles correspondent à l'interface effectivement mise en ligne.
+
+![Maquette — Mes transferts (desktop et mobile)](maquettes/1-mes-transferts.png)
+
+L'écran **Mes transferts** est le tableau de bord : il liste les transferts de l'utilisateur avec leur référence, le montant envoyé, le montant reçu en euros et un badge de statut coloré. L'action principale (« Nouvel envoi ») est mise en avant.
+
+![Maquette — Bénéficiaires (desktop et mobile)](maquettes/2-beneficiaires.png)
+
+L'écran **Bénéficiaires** juxtapose le formulaire d'ajout et la liste des bénéficiaires enregistrés, chacun identifié par un avatar à initiales, son email et son IBAN.
+
+![Maquette — Nouvel envoi (desktop et mobile)](maquettes/3-nouvel-envoi.png)
+
+L'écran **Nouvel envoi** est le cœur du parcours : une carte de conversion affiche en temps réel le montant envoyé en FCFA et le montant reçu en euros, avec le rappel du taux et des frais. L'utilisateur choisit ensuite son bénéficiaire et son moyen de paiement mobile money.
+
+![Maquette — Espace administrateur (desktop et mobile)](maquettes/4-admin.png)
+
+L'**espace administrateur** présente les statistiques clés (dont le volume total mis en évidence sur une carte pleine), la supervision de tous les transferts avec changement de statut, et la gestion des utilisateurs et de leurs rôles.
+
+## 6.5 Accessibilité
 
 Les règles d'accessibilité issues du référentiel RGAA ont été prises en compte : utilisation d'éléments HTML sémantiques, association explicite des libellés aux champs de formulaire, contrastes suffisants entre le texte et le fond, navigation possible au clavier, et gestion visible du focus.
 
-## 6.5 Responsive et approche mobile-first
+## 6.6 Responsive et approche mobile-first
 
 L'interface a été développée en approche **mobile-first** : les styles par défaut ciblent le mobile, et des adaptations sont ajoutées pour les écrans plus larges. L'application a été testée sur trois tailles de référence : mobile (375 px), tablette (768 px) et ordinateur (1280 px). Ce choix est cohérent avec l'usage réel du service, majoritairement mobile.
 
@@ -307,7 +329,11 @@ Le MCD, exprimé en formalisme entité-association, fait apparaître trois entit
 
 ## 8.2 Modèle Logique de Données (MLD)
 
-Le passage au MLD traduit chaque entité en table et chaque association en clé étrangère, en précisant les types et les contraintes.
+Le passage au MLD traduit chaque entité en table et chaque association en clé étrangère, en précisant les types et les contraintes. Chaque association « 1,n » du MCD donne lieu à une **clé étrangère du côté « n »** : `beneficiaire.utilisateur_id`, `transfert.utilisateur_id` et `transfert.beneficiaire_id`.
+
+![MLD de NORU](diagrams/img/0b-mld.png)
+
+Le détail de chaque table est présenté ci-dessous.
 
 **Table `utilisateur`**
 
@@ -453,9 +479,94 @@ Cette section présente brièvement chaque technologie mobilisée et sa contribu
 
 Le backend est organisé en modules, chacun regroupant un contrôleur, un service et ses objets de transfert. Le module **Auth** gère l'inscription (avec hachage bcrypt du mot de passe), la connexion (avec génération d'un jeton JWT) et la suppression de compte (droit à l'effacement). Le module **Beneficiaires** gère les opérations CRUD sur les bénéficiaires, avec un contrôle strict d'appartenance : un utilisateur n'accède qu'à ses propres bénéficiaires. Le module **Transferts** porte la logique métier : à la création, il vérifie l'appartenance du bénéficiaire, calcule les frais (2 % du montant) et la conversion FCFA→EUR (au taux fixe de 655,957), génère une référence unique, et enregistre le transfert au statut initial ; il gère aussi le paiement par mobile money et le passage de statut. Le module **Admin** offre la supervision et les opérations CRUD sur les utilisateurs et les transferts, protégées par un rôle administrateur. Le module **Notifications** enregistre les notifications dans MongoDB et prépare l'email (dont l'envoi réel est prévu en évolution).
 
+**Extrait de code — `TransfertsService.create()`** (`backend/src/transferts/transferts.service.ts`)
+
+Cet extrait illustre la couche métier : le contrôle d'appartenance (sécurité), les calculs de conversion et de frais, puis l'écriture en base via Prisma.
+
+```ts
+@Injectable()
+export class TransfertsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(utilisateurId: number, dto: CreateTransfertDto) {
+    // 1. Le bénéficiaire doit exister ET appartenir à l'utilisateur.
+    const beneficiaire = await this.prisma.beneficiaire.findUnique({
+      where: { id: dto.beneficiaireId },
+    });
+    if (!beneficiaire || beneficiaire.utilisateurId !== utilisateurId) {
+      throw new NotFoundException('Bénéficiaire introuvable');
+    }
+
+    // 2. Calculs métier (arrondis à 2 décimales).
+    const fraisFcfa = this.arrondir(dto.montantFcfa * FRAIS_POURCENT);
+    const montantEur = this.arrondir(dto.montantFcfa / TAUX_CHANGE_XOF_EUR);
+
+    // 3. Création en base, au statut initial EN_ATTENTE.
+    return this.prisma.transfert.create({
+      data: {
+        montantFcfa: dto.montantFcfa,
+        fraisFcfa,
+        montantEur,
+        tauxChange: TAUX_CHANGE_XOF_EUR,
+        reference: this.genererReference(),
+        utilisateurId,
+        beneficiaireId: dto.beneficiaireId,
+      },
+      include: { beneficiaire: true },
+    });
+  }
+}
+```
+
+Trois points sont à souligner. D'abord, le **contrôle d'appartenance** (étape 1) garantit qu'un utilisateur ne peut créer un transfert que vers **ses propres** bénéficiaires : c'est la traduction en code de l'exigence de contrôle d'accès. Ensuite, les **calculs métier** sont réalisés côté serveur (étape 2) et jamais côté client, afin qu'ils ne puissent pas être manipulés ; le **taux appliqué est stocké** dans le transfert pour la traçabilité. Enfin, l'écriture passe par **Prisma** (étape 3), dont les requêtes paramétrées protègent nativement contre l'injection SQL.
+
 ## 11.2 Frontend (React)
 
 Le frontend est organisé par pages (connexion, inscription, tableau de bord, bénéficiaires, nouvel envoi, espace administrateur) et par composants réutilisables (mise en page, badge de statut, route protégée). L'état de session (le jeton JWT) est géré par un contexte React. Les appels à l'API sont centralisés dans un module unique qui ajoute automatiquement le jeton et remonte les erreurs sous forme de messages lisibles. L'interface gère les états de chargement et d'erreur sur chaque appel, et est développée en approche mobile-first avec Tailwind CSS.
+
+**Extrait de code — le client d'API** (`frontend/src/lib/api.ts`)
+
+Cet extrait illustre la centralisation des appels réseau : un point d'entrée unique qui injecte le jeton JWT et normalise les erreurs.
+
+```ts
+// Adresse de l'API : "/api" en développement (proxy Vite), URL publique en production.
+const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api';
+
+function getToken(): string | null {
+  return localStorage.getItem('noru_token');
+}
+
+export async function api<T = any>(
+  chemin: string,
+  options: { method?: string; body?: unknown } = {},
+): Promise<T> {
+  const token = getToken();
+
+  const res = await fetch(BASE + chemin, {
+    method: options.method ?? 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      // Le jeton est ajouté automatiquement à chaque requête authentifiée.
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    // L'API renvoie parfois un tableau de messages (erreurs de validation).
+    const message = Array.isArray(data.message)
+      ? data.message.join(' ')
+      : data.message;
+    throw new Error(message || 'Une erreur est survenue');
+  }
+
+  return data as T;
+}
+```
+
+Ce module unique applique le principe **DRY** : le jeton JWT est ajouté au header `Authorization` en un seul endroit, et les erreurs de l'API sont converties en messages lisibles pour l'utilisateur, plutôt qu'en codes techniques. Toutes les pages consomment cette fonction, ce qui rend le traitement des erreurs homogène sur toute l'application.
 
 ```{=openxml}
 <w:p><w:r><w:br w:type="page"/></w:r></w:p>
@@ -571,10 +682,57 @@ Au-delà du résultat technique — une application fonctionnelle, testée, vers
 
 # 18. Annexes
 
-- **Sources des diagrammes** (PlantUML) : dossier `docs/diagrams/` du dépôt.
-- **Liste complète des user stories** : `docs/01-user-stories.md`.
-- **Cahier des charges détaillé** : `docs/02-cahier-des-charges.md`.
-- **Modèle de données** : `docs/03-modele-de-donnees.md`.
-- **Documentation de déploiement** : `docs/06-deploiement.md`.
-- **Code source** : https://github.com/ABDULMVLICK/noru
-- **Application en ligne** : https://noru-two.vercel.app
+## 18.1 Liens du projet
+
+| Ressource | Adresse |
+|---|---|
+| **Code source (dépôt GitHub)** | https://github.com/ABDULMVLICK/noru |
+| **Application en ligne** | https://noru-two.vercel.app |
+| **API (backend)** | https://noru-production.up.railway.app/api |
+| **Images Docker (registre)** | https://github.com/ABDULMVLICK/noru/pkgs/container/noru |
+| **Intégration continue** | https://github.com/ABDULMVLICK/noru/actions |
+
+## 18.2 Documents du projet
+
+| Document | Emplacement |
+|---|---|
+| Liste complète des user stories | `docs/01-user-stories.md` |
+| Cahier des charges détaillé | `docs/02-cahier-des-charges.md` |
+| Modèle de données (MCD / MLD / MPD) | `docs/03-modele-de-donnees.md` |
+| Diagrammes UML (descriptif) | `docs/04-diagrammes-uml.md` |
+| Documentation de déploiement et rollback | `docs/06-deploiement.md` |
+| Journal de développement et incidents | `docs/07-journal-developpement.md` |
+| Sources des diagrammes (PlantUML) | `docs/diagrams/*.puml` |
+| Rendus des diagrammes (PNG) | `docs/diagrams/img/` |
+| Maquettes haute fidélité | `docs/maquettes/` |
+
+## 18.3 Technologies et outils utilisés
+
+| Domaine | Outils |
+|---|---|
+| **Frontend** | React, TypeScript, Vite, Tailwind CSS, React Router |
+| **Backend** | NestJS, TypeScript, Node.js, class-validator |
+| **Données** | MySQL, Prisma (ORM + migrations), MongoDB, Mongoose |
+| **Sécurité** | JWT (passport-jwt), bcrypt |
+| **Tests** | Jest, Supertest |
+| **Qualité** | TypeScript strict, ESLint / oxlint |
+| **Conteneurisation** | Docker, Docker Compose |
+| **CI / CD** | GitHub Actions, GHCR (registre d'images) |
+| **Hébergement** | Vercel (frontend), Railway (API, MySQL, MongoDB) |
+| **Conception** | PlantUML (diagrammes UML), Merise (MCD/MLD/MPD) |
+| **Versionnement** | Git, GitHub (branche protégée, Pull Requests, Conventional Commits) |
+
+## 18.4 Références et sources documentaires
+
+| Sujet | Source |
+|---|---|
+| Sécurité applicative | OWASP Top 10 — https://owasp.org |
+| Alertes de sécurité | CERT-FR (ANSSI) — https://www.cert.ssi.gouv.fr |
+| Référence web | MDN Web Docs — https://developer.mozilla.org |
+| Framework backend | Documentation NestJS — https://docs.nestjs.com |
+| ORM | Documentation Prisma — https://www.prisma.io/docs |
+| Frontend | Documentation React — https://react.dev |
+| Protection des données (UE) | RGPD / CNIL — https://www.cnil.fr |
+| Protection des données (Bénin) | APDP — https://apdp.bj · Code du numérique (Loi n°2017-20 du 20 avril 2018) |
+| Monnaie électronique (UEMOA) | BCEAO — Instruction n°008-05-2015 — https://www.bceao.int |
+| Établissement de paiement (France) | ACPR / Banque de France — https://acpr.banque-france.fr |

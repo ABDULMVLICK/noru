@@ -6,7 +6,9 @@ import { api } from '../lib/api';
 // sont appliqués par le backend ; ici on affiche juste le montant converti.
 const TAUX = 655.957;
 
-// Moyens de paiement proposés (visuel : c'est une simulation de mobile money).
+// Moyens de paiement proposés. Le choix est affiché à l'utilisateur mais n'est
+// pas encore transmis à l'API : le raccordement aux opérateurs viendra avec
+// l'agrément et les accords MTN / Moov.
 const METHODES = ['MTN Money', 'Moov Money', 'Carte'];
 
 interface Beneficiaire {
@@ -132,7 +134,7 @@ export default function NouveauTransfert() {
               </select>
             </div>
 
-            {/* Méthode de paiement (visuel : simulation mobile money) */}
+            {/* Méthode de paiement mobile money */}
             <div>
               <label className="block text-sm font-semibold text-stone-600 mb-1">
                 Méthode de paiement

@@ -12,7 +12,9 @@ export class NotificationsService {
     private readonly model: Model<Notification>,
   ) {}
 
-  // Enregistre la notification dans MongoDB et "envoie" l'email (simulé via log).
+  // Enregistre la notification dans MongoDB et prépare l'email.
+  // L'envoi réel via un service SMTP n'est pas encore branché : le message est
+  // journalisé. C'est le point de raccordement prévu pour cette évolution.
   async notifierReception(params: {
     destinataire: string;
     nomReceveur: string;
@@ -35,7 +37,8 @@ export class NotificationsService {
     });
 
     this.logger.log(
-      `📧 (simulé) Email envoyé à ${params.destinataire} — ${sujet}`,
+      `📧 Notification enregistrée pour ${params.destinataire} — ${sujet} ` +
+        `(envoi SMTP non branché)`,
     );
     return notif;
   }
